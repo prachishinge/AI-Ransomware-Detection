@@ -20,94 +20,51 @@ import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import (
-    accuracy_score,
-    classification_report,
-    confusion_matrix
-)
+from sklearn.metrics import accuracy_score
 
 # ==========================================================
-# PAGE CONFIGURATION
+# PAGE CONFIG
 # ==========================================================
 st.set_page_config(
-    page_title=" AI Ransomware Detection",
+    page_title="AI Ransomware Detection",
     page_icon="🛡️",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
 # ==========================================================
-# CUSTOM CSS DESIGN
+# CUSTOM CSS
 # ==========================================================
 st.markdown("""
 <style>
 
-/* Background */
-.stApp {
-    background: linear-gradient(135deg,#000428,#004e92,#000428);
-    color: white;
+.stApp{
+    background:linear-gradient(135deg,#000428,#004e92,#000428);
+    color:white;
 }
 
-/* Main Title */
-.main-title {
+.main-title{
     text-align:center;
-    font-size:70px;
+    font-size:65px;
     font-weight:bold;
     color:#00F5FF;
     text-shadow:0px 0px 25px cyan;
-    animation: glow 2s infinite alternate;
 }
 
-/* Glow Animation */
-@keyframes glow {
-    from {
-        text-shadow:0px 0px 10px cyan;
-    }
-    to {
-        text-shadow:0px 0px 40px cyan;
-    }
-}
-
-/* Subtitle */
-.sub-title {
+.sub-title{
     text-align:center;
-    font-size:24px;
-    margin-bottom:35px;
-    color:white;
+    font-size:22px;
+    margin-bottom:30px;
 }
 
-/* Glass Cards */
-.card {
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(12px);
-    padding:25px;
+.card{
+    background:rgba(255,255,255,0.08);
+    padding:20px;
     border-radius:20px;
     text-align:center;
-    box-shadow:0px 0px 20px rgba(0,255,255,0.25);
-    transition:0.3s;
+    box-shadow:0px 0px 20px rgba(0,255,255,0.2);
 }
 
-.card:hover {
-    transform:scale(1.05);
-}
-
-/* Tabs */
-.stTabs [data-baseweb="tab"] {
-    background:#111827;
-    color:white;
-    font-size:18px;
-    font-weight:bold;
-    border-radius:12px;
-    padding:10px;
-}
-
-.stTabs [aria-selected="true"] {
-    background:#00F5FF !important;
-    color:black !important;
-}
-
-/* Alert */
-.alert-box {
+.alert-box{
     background:linear-gradient(135deg,#ff0000,#ff4b4b);
     padding:25px;
     border-radius:20px;
@@ -115,28 +72,16 @@ st.markdown("""
     font-size:28px;
     font-weight:bold;
     color:white;
-    box-shadow:0px 0px 35px red;
 }
 
-/* Sidebar */
-section[data-testid="stSidebar"] {
-    background:#081120;
-}
-
-/* Buttons */
-.stButton>button {
-    background: linear-gradient(to right,#00F5FF,#00FF99);
+.stButton>button{
+    background:linear-gradient(to right,#00F5FF,#00FF99);
     color:black;
     font-size:18px;
     font-weight:bold;
     border-radius:12px;
     height:55px;
     width:100%;
-}
-
-/* Progress */
-.stProgress > div > div > div {
-    background-color:#00F5FF;
 }
 
 </style>
@@ -147,7 +92,7 @@ section[data-testid="stSidebar"] {
 # ==========================================================
 st.markdown("""
 <div class='main-title'>
-🛡️  AI Ransomware Detection
+🛡️ AI Ransomware Detection
 </div>
 
 <div class='sub-title'>
@@ -156,14 +101,12 @@ Real-Time Threat Intelligence & Cloud Malware Analytics
 """, unsafe_allow_html=True)
 
 # ==========================================================
-# LOAD DATASET
+# LOAD DATA
 # ==========================================================
 @st.cache_data
 def load_data():
 
-    data = pd.read_csv(
-        "data_file.csv"
-    )
+    data = pd.read_csv("data_file.csv")
 
     data = data.fillna(0)
 
@@ -176,7 +119,7 @@ data = load_data()
 # ==========================================================
 X = data.drop("Benign", axis=1)
 
-# Keep only numeric columns
+# Keep numeric columns only
 X = X.select_dtypes(include=['int64','float64'])
 
 y = data["Benign"]
@@ -186,8 +129,8 @@ scaler = StandardScaler()
 
 X_scaled = scaler.fit_transform(X)
 
-# Train-Test Split
-X_train, X_test, y_train, y_test = train_test_split(
+# Train test split
+X_train,X_test,y_train,y_test = train_test_split(
     X_scaled,
     y,
     test_size=0.2,
@@ -196,31 +139,23 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # ==========================================================
-# ADVANCED MODEL
+# MODEL
 # ==========================================================
 model = RandomForestClassifier(
-    n_estimators=500,
-    max_depth=25,
-    min_samples_split=2,
-    min_samples_leaf=1,
+    n_estimators=300,
+    max_depth=20,
     random_state=42
 )
 
-# Training
-model.fit(X_train, y_train)
+model.fit(X_train,y_train)
 
-# Save Model
-joblib.dump(model,"elite_ransomware_model.pkl")
-
-# ==========================================================
-# MODEL ACCURACY
-# ==========================================================
+# Accuracy
 y_pred = model.predict(X_test)
 
-accuracy = accuracy_score(y_test, y_pred)
+accuracy = accuracy_score(y_test,y_pred)
 
 # ==========================================================
-# TOP METRIC CARDS
+# TOP CARDS
 # ==========================================================
 col1,col2,col3,col4 = st.columns(4)
 
@@ -236,7 +171,7 @@ with col2:
     st.markdown(f"""
     <div class='card'>
     <h2>🎯 Accuracy</h2>
-    <h1>{accuracy:.2f}</h1>
+    <h1>{accuracy*100:.2f}%</h1>
     </div>
     """, unsafe_allow_html=True)
 
@@ -251,87 +186,96 @@ with col3:
     """, unsafe_allow_html=True)
 
 with col4:
-    st.markdown(f"""
+    st.markdown("""
     <div class='card'>
     <h2>🛡 Security</h2>
     <h1>ACTIVE</h1>
     </div>
     """, unsafe_allow_html=True)
 
-st.write("")
-
 # ==========================================================
-# CREATE TABS
+# TABS
 # ==========================================================
-tab1,tab2,tab3,tab4,tab5 = st.tabs([
+tab1,tab2,tab3,tab4 = st.tabs([
     "📂 File Activity",
     "🧠 Prediction",
     "📊 Analytics",
-    "📈 Threat Monitor",
-    "⚙ Security Logs"
+    "📈 Threat Monitor"
 ])
 
 # ==========================================================
-# TAB 1 : FILE ACTIVITY
+# TAB 1
 # ==========================================================
 with tab1:
 
-    st.markdown("## 📂 Simulate File Behaviour")
+    st.subheader("📂 Simulate File Activity")
 
     col1,col2 = st.columns(2)
 
     with col1:
 
         debug_size = st.slider(
-            "🛠 Debug Information Size",
-            0,1000,120
+            "🛠 Debug Size",
+            0,1000,100
         )
 
         export_size = st.slider(
-            "📦 Export Function Size",
-            0,1000,60
+            "📦 Export Size",
+            0,1000,50
         )
 
         resource_size = st.slider(
-            "📁 File Resource Usage",
-            0,5000,700
+            "📁 Resource Size",
+            0,5000,500
         )
 
     with col2:
 
         number_sections = st.slider(
-            "🧩 Executable Sections",
+            "🧩 Number Of Sections",
             0,20,4
         )
 
         bitcoin_addresses = st.slider(
-            "💰 Bitcoin Wallet Activity",
+            "💰 Bitcoin Addresses",
             0,10,1
         )
 
         encryption_score = st.slider(
-            "🔐 Encryption Behaviour Score",
-            0,100,40
+            "🔐 Encryption Score",
+            0,100,30
         )
 
-    st.info("""
-    These behavioural parameters help the AI model
-    identify suspicious ransomware patterns.
-    """)
-
 # ==========================================================
-# TAB 2 : PREDICTION
+# TAB 2
 # ==========================================================
 with tab2:
 
-    st.markdown("## 🧠 AI Threat Prediction")
+    st.subheader("🧠 AI Threat Prediction")
 
-    if st.button("🚀 START AI THREAT SCAN"):
+    if st.button("🚀 START AI SCAN"):
 
-        with st.spinner("🔍 AI Engine Scanning Activity..."):
-            time.sleep(3)
+        with st.spinner("Scanning Threat Activity..."):
+            time.sleep(2)
 
-        # Input Data
+        # ==================================================
+        # THREAT SCORE LOGIC
+        # ==================================================
+        threat_score = (
+            debug_size * 0.10 +
+            export_size * 0.10 +
+            resource_size * 0.05 +
+            number_sections * 5 +
+            bitcoin_addresses * 15 +
+            encryption_score * 0.8
+        )
+
+        # Normalize
+        threat_score = min(threat_score,100)
+
+        # ==================================================
+        # ML PREDICTION
+        # ==================================================
         input_data = {
             "DebugSize": debug_size,
             "ExportSize": export_size,
@@ -347,20 +291,14 @@ with tab2:
             fill_value=0
         )
 
-        # Scaling
         input_scaled = scaler.transform(input_df)
 
-        # Prediction
         prediction = model.predict(input_scaled)
 
-        probability = model.predict_proba(
-            input_scaled
-        )[0][0]
-
         # ==================================================
-        # RANSOMWARE DETECTED
+        # FINAL PREDICTION LOGIC
         # ==================================================
-        if prediction[0] == 0:
+        if threat_score > 60 or prediction[0] == 0:
 
             st.markdown("""
             <div class='alert-box'>
@@ -368,16 +306,10 @@ with tab2:
             </div>
             """, unsafe_allow_html=True)
 
-            threat_score = probability * 100
-
-            st.write("")
-
-            st.subheader("🔥 Threat Meter")
-
             st.progress(int(threat_score))
 
             # Gauge Chart
-            gauge = go.Figure(go.Indicator(
+            fig = go.Figure(go.Indicator(
                 mode="gauge+number",
                 value=threat_score,
                 title={'text':"Threat Level"},
@@ -385,15 +317,15 @@ with tab2:
                     'axis':{'range':[0,100]},
                     'bar':{'color':"red"},
                     'steps':[
-                        {'range':[0,50],'color':"green"},
-                        {'range':[50,80],'color':"orange"},
-                        {'range':[80,100],'color':"red"}
+                        {'range':[0,40],'color':"green"},
+                        {'range':[40,70],'color':"orange"},
+                        {'range':[70,100],'color':"red"}
                     ]
                 }
             ))
 
             st.plotly_chart(
-                gauge,
+                fig,
                 use_container_width=True
             )
 
@@ -401,14 +333,13 @@ with tab2:
                 f"⚠ Threat Probability : {threat_score:.2f}%"
             )
 
-            # Risk Analysis
-            st.markdown("## ⚠ Risk Analysis")
+            st.markdown("## 🔥 AI Risk Analysis")
 
             st.write("""
             - Suspicious encryption behaviour detected
-            - File structure indicates malware pattern
             - Cryptocurrency activity identified
-            - High executable anomaly score
+            - File structure anomaly detected
+            - Potential ransomware payload behaviour
             """)
 
             st.write(
@@ -416,9 +347,6 @@ with tab2:
                 datetime.datetime.now()
             )
 
-        # ==================================================
-        # NORMAL ACTIVITY
-        # ==================================================
         else:
 
             st.success(
@@ -428,17 +356,17 @@ with tab2:
             st.balloons()
 
 # ==========================================================
-# TAB 3 : ANALYTICS
+# TAB 3
 # ==========================================================
 with tab3:
 
-    st.markdown("## 📊 Malware Analytics")
+    st.subheader("📊 Threat Analytics")
 
     # Pie Chart
     fig1 = px.pie(
         names=["Normal","Ransomware"],
         values=data["Benign"].value_counts(),
-        hole=0.55,
+        hole=0.5,
         template="plotly_dark"
     )
 
@@ -475,7 +403,7 @@ with tab3:
     )
 
     # Heatmap
-    st.markdown("## 📈 Correlation Heatmap")
+    st.subheader("📈 Correlation Heatmap")
 
     fig,ax = plt.subplots(figsize=(10,6))
 
@@ -487,11 +415,11 @@ with tab3:
     st.pyplot(fig)
 
 # ==========================================================
-# TAB 4 : THREAT MONITOR
+# TAB 4
 # ==========================================================
 with tab4:
 
-    st.markdown("## 📈 Live Threat Monitoring")
+    st.subheader("📈 Live Threat Monitoring")
 
     trend_data = pd.DataFrame({
         "Time":[1,2,3,4,5,6,7,8],
@@ -514,76 +442,28 @@ with tab4:
         use_container_width=True
     )
 
-    # Fake Live Alerts
     st.markdown("## 🚨 Recent Threat Alerts")
 
     alerts = pd.DataFrame({
 
-        "Time":[
-            str(datetime.datetime.now())
-            for i in range(5)
-        ],
-
         "Threat":[
             "Encryption Attack",
-            "Malicious Executable",
             "Crypto Activity",
             "Suspicious Payload",
+            "Malicious Executable",
             "Ransomware Pattern"
         ],
 
         "Severity":[
             "High",
+            "Critical",
             "Medium",
             "High",
-            "Low",
             "Critical"
         ]
     })
 
     st.dataframe(alerts)
-
-# ==========================================================
-# TAB 5 : SECURITY LOGS
-# ==========================================================
-with tab5:
-
-    st.markdown("## ⚙ System Security Logs")
-
-    log_data = pd.DataFrame({
-
-        "Timestamp":[
-            str(datetime.datetime.now())
-            for i in range(6)
-        ],
-
-        "Activity":[
-            "Firewall Activated",
-            "Cloud Monitoring Enabled",
-            "Threat Detection Completed",
-            "Dataset Loaded",
-            "AI Model Trained",
-            "Security Scan Finished"
-        ],
-
-        "Status":[
-            "Success",
-            "Running",
-            "Completed",
-            "Success",
-            "Completed",
-            "Success"
-        ]
-    })
-
-    st.dataframe(log_data)
-
-    st.download_button(
-        label="📥 Download Security Logs",
-        data=log_data.to_csv(index=False),
-        file_name="security_logs.csv",
-        mime="text/csv"
-    )
 
 # ==========================================================
 # FOOTER
@@ -595,7 +475,7 @@ st.markdown("""
 
 <h3 style='color:#00F5FF;'>
 
-🔐 Elite AI Cloud Security & Threat Intelligence Dashboard
+🔐 Elite AI Cloud Security Dashboard
 
 </h3>
 
