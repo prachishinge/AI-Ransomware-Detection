@@ -1,0 +1,4 @@
+2026-05-08 14:26:43.941764 | HIGH | Suspicious ransomware activity detected
+2026-05-08 14:27:06.769842 | HIGH | Suspicious ransomware activity detected
+2026-05-08 14:35:37.432750 | HIGH | Suspicious ransomware activity detected
+2026-05-11 13:37:11.173278 | HIGH | Suspicious ransomware activity detected
