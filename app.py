@@ -219,7 +219,7 @@ with col4:
     """, unsafe_allow_html=True)
 
 # ==========================================================
-# TABS
+# CREATE TABS
 # ==========================================================
 tab1,tab2,tab3,tab4,tab5 = st.tabs([
     "📂 File Activity",
@@ -290,42 +290,25 @@ with tab2:
             time.sleep(2)
 
         # ====================================
-        # CUSTOM THREAT LOGIC
+        # THREAT SCORE CALCULATION
         # ====================================
 
-        threat_score = 0
-
-        # Debug Size
-        if debug_size > 300:
-            threat_score += 20
-
-        # Export Size
-        if export_size > 300:
-            threat_score += 20
-
-        # Resource Usage
-        if resource_size > 2000:
-            threat_score += 20
-
-        # Executable Sections
-        if number_sections > 8:
-            threat_score += 20
-
-        # Bitcoin Activity
-        if bitcoin_addresses > 3:
-            threat_score += 20
-
-        # Encryption Score
-        if encryption_score > 60:
-            threat_score += 20
+        threat_score = (
+            debug_size
+            + export_size
+            + (resource_size / 10)
+            + (number_sections * 50)
+            + (bitcoin_addresses * 100)
+            + (encryption_score * 5)
+        )
 
         # ====================================
         # NORMAL ACTIVITY
         # ====================================
 
-        if threat_score < 60:
+        if threat_score < 1000:
 
-            safe_score = 100 - threat_score
+            safe_score = 100 - min(int(threat_score / 10), 100)
 
             st.success("✅ NORMAL ACTIVITY DETECTED")
 
@@ -374,6 +357,8 @@ with tab2:
 
         else:
 
+            danger_score = min(int(threat_score / 10), 100)
+
             st.markdown("""
             <div class='alert-box'>
             🚨 RANSOMWARE DETECTED 🚨
@@ -382,11 +367,11 @@ with tab2:
 
             st.subheader("🔥 Threat Meter")
 
-            st.progress(int(threat_score))
+            st.progress(danger_score)
 
             gauge = go.Figure(go.Indicator(
                 mode="gauge+number",
-                value=threat_score,
+                value=danger_score,
                 title={'text': "Threat Level"},
                 gauge={
                     'axis': {'range': [0, 100]},
@@ -405,7 +390,7 @@ with tab2:
             )
 
             st.error(
-                f"🚨 Threat Probability : {threat_score:.2f}%"
+                f"🚨 Threat Probability : {danger_score:.2f}%"
             )
 
             st.write("### ⚠ Risk Analysis")
@@ -467,17 +452,6 @@ with tab3:
         fig2,
         use_container_width=True
     )
-
-    st.markdown("## 📈 Correlation Heatmap")
-
-    fig,ax = plt.subplots(figsize=(10,6))
-
-    sns.heatmap(
-        data.select_dtypes(include=np.number).corr(),
-        cmap="coolwarm"
-    )
-
-    st.pyplot(fig)
 
 # ==========================================================
 # TAB 4 : THREAT MONITOR
